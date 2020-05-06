@@ -1,0 +1,8 @@
+---
+puppet_agent_conf:
+  - name: certname
+    value: "{{ ansible_fqdn }}"
+  - name: server
+    value: "{{ groups['puppet_master'] | map('extract', hostvars, ['ansible_fqdn']) | join('') }}"
+  - name: runinterval
+    value: 5m

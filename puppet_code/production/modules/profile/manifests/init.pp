@@ -1,0 +1,3 @@
+# profile class
+class profile {
+}

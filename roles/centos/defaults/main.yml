@@ -1,0 +1,64 @@
+centos:
+  timezone: Europe/Helsinki
+  locale: |
+    LANG=en_US.utf-8
+    LC_ALL=en_US.utf-8
+  modules_load: |
+    nf_conntrack
+  packages:
+    - vim
+    - nano
+    - net-tools
+    - htop
+    - iftop
+    - iotop
+    - bind-utils
+    - libselinux-python
+    - wget
+    - bash-completion
+    - sysstat
+    - ntp
+    - rsync
+    - git
+    - unzip
+    - python-backports-ssl_match_hostname
+    - python2-pip
+    - tcpdump
+    - nmap
+    - bridge-utils
+    - python36
+    - libselinux-python
+    - mc
+    - puppet
+  master_packages:
+    - foreman-release-scl
+    - foreman-installer
+  remove:
+    - firewalld
+
+centos_add_repo:
+  node:
+    - "https://yum.puppet.com/puppet6-release-el-7.noarch.rpm"
+    - "http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+  master:
+    - "https://yum.theforeman.org/releases/2.0/el7/x86_64/foreman-release.rpm"
+
+journald_options:
+  - option: "Storage"
+    value: "persistent"
+  - option: "Compress"
+    value: "yes"
+  - option: "SystemMaxUse"
+    value: "500M"
+  - option: "SystemMaxFileSize"
+    value: "50M"
+  - option: "RuntimeMaxUse"
+    value: "500M"
+  - option: "RuntimeMaxFileSize"
+    value: "50M"
+  - option: "ForwardToSyslog"
+    value: "no"
+  - option: "RateLimitInterval"
+    value: "0"
+  - option: "RateLimitBurst"
+    value: "0"

@@ -1,0 +1,5 @@
+<network>
+  <name>extbr0</name>
+  <forward mode="bridge"/>
+  <bridge name="extbr0"/>
+</network>

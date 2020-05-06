@@ -1,0 +1,5 @@
+classes:
+  - dynmotd
+  - profile::sysctl
+  - prometheus::node_exporter
+

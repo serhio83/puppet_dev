@@ -1,0 +1,48 @@
+---
+- name: Generate /etc/hosts
+  hosts: all
+  tasks:
+    - name: "Build hosts file"
+      lineinfile:
+        dest: /etc/hosts
+        regexp: ".*{{ item }}$"
+        line: "{{ hostvars[item].ansible_eth0.ipv4.address }} {{item}}"
+        state: present
+      when: hostvars[item].ansible_eth0.ipv4.address is defined
+      loop: "{{ groups['all'] }}"
+  tags:
+    - hosts
+
+- name: Install os + dependencies on all hosts
+  hosts: all
+  roles:
+    - centos
+  tags:
+    - os
+
+- name: Install the foreman
+  hosts: puppet_master
+  tasks:
+    - name: Run foreman-installer
+      shell: "foreman-installer"
+      register: shell_result
+      when: inventory_hostname in groups['puppet_master']
+      changed_when: shell_result.stdout != ""
+    - name: Print stdout
+      debug:
+        msg: "{{ shell_result.stdout }}"
+    - name: configure puppet
+      ini_file:
+        path: /etc/puppetlabs/puppet/puppet.conf
+        section: agent
+        option: "runinterval"
+        value: "5m"
+
+- name: Install puppet agent
+  hosts: puppet_node
+  roles:
+    - puppet-agent
+  tags:
+    - puppet
+  # when:
+  #   - shell_result.stdout is defined

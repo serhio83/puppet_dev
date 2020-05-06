@@ -1,0 +1,230 @@
+classes:
+  - dynmotd
+  - profile::sysctl
+  - profile::db::postgresql
+  - profile::db::pgdg_repo
+  - pgbouncer
+  - prometheus::node_exporter
+  - profile::test
+
+profile::test::somehash:
+  foo: bar
+  somekey: someval
+  zxc: 123
+
+# Postgresql configuration
+profile::db::postgresql::globals:
+  manage_package_repo: true
+  version: "9.5"
+
+profile::db::postgresql::params:
+  port: 5432
+
+# see https://github.com/puppetlabs/puppetlabs-postgresql/blob/master/manifests/server/extension.pp
+# add postgress extensions
+profile::db::postgresql::extensions:
+  "add extension pg_stat_statements to dbs":
+    extension: pg_stat_statements
+    database: dbs
+  "add extension pg_trgm to dbs":
+    extension: pg_trgm
+    database: dbs
+
+profile::db::postgresql::databases:
+  dbs: {}
+
+profile::db::postgresql::hba_rules:
+  "subnet 192.168.88.0/24":
+    type: "host"
+    database: "all"
+    user: "all"
+    auth_method: "md5"
+    address: "192.168.88.0/24"
+    order: "002"
+
+# see https://github.com/puppetlabs/puppetlabs-postgresql/blob/master/manifests/server/role.pp
+profile::db::postgresql::roles:
+  pgbouncer:
+    password_hash: "md5548b90a1bea3616fa41629f5cde79583"
+  dbs:
+    password_hash: "md55c54a3d478e0d63152388c11d606ff58"
+  r_dbs_ro:
+    login: false
+    inherit: true
+    createrole: false
+    createdb: false
+    superuser: false
+    replication: false
+  g_dbs_ro:
+    login: false
+    inherit: true
+    createrole: false
+    createdb: false
+    superuser: false
+    replication: false
+  r_dbs_arwd:
+    login: false
+    inherit: true
+    createrole: false
+    createdb: false
+    superuser: false
+    replication: false
+  g_dbs_arwd:
+    login: false
+    inherit: true
+    createrole: false
+    createdb: false
+    superuser: false
+    replication: false
+#
+# see: https://github.com/puppetlabs/puppetlabs-postgresql/blob/master/manifests/server/grant.pp
+profile::db::postgresql::grants:
+  r_dbs_ro:
+    object_type: "ALL TABLES IN SCHEMA"
+    object_name: "public"
+    privilege: "SELECT"
+    db: "dbs"
+    role: "r_dbs_ro"
+  r_dbs_ro:
+    object_type: "ALL SEQUENCES IN SCHEMA"
+    object_name: "public"
+    privilege: "SELECT"
+    db: "dbs"
+    role: "r_dbs_ro"
+
+profile::db::postgresql::db_configs:
+  "listen_addresses":
+    value: "%{::networking.ip}"
+  "max_connections":
+    value: "50" # production: 800
+  "shared_buffers":
+    value: "1GB" # production: 32GB
+  "huge_pages":
+    value: "try"
+  "temp_buffers":
+    value: "32MB"
+  "work_mem":
+    value: "279620kB"
+  "maintenance_work_mem":
+    value: "2GB"
+  "dynamic_shared_memory_type":
+    value: "posix"
+  "shared_preload_libraries":
+    value: "pg_stat_statements"
+  "pg_stat_statements.max":
+    value: "30000"
+  "pg_stat_statements.track":
+    value: "all"
+  "vacuum_cost_page_hit":
+    value: "1"
+  "vacuum_cost_page_miss":
+    value: "1"
+  "vacuum_cost_page_dirty":
+    value: "10"
+  "vacuum_cost_limit":
+    value: "1000"
+  "bgwriter_delay":
+    value: "10ms"
+  "bgwriter_lru_maxpages":
+    value: "1000"
+  "bgwriter_lru_multiplier":
+    value: "10.0"
+  "wal_level":
+    value: "hot_standby"
+  "fsync":
+    value: "on"
+  "synchronous_commit":
+    value: "off"
+  "wal_buffers":
+    value: "8MB"
+  "max_wal_size":
+    value: "512MB"
+  "min_wal_size":
+    value: "256MB"
+  "checkpoint_completion_target":
+    value: "0.7"
+  "archive_mode":
+    value: "on"
+  "archive_command":
+    value: "cd ."
+  "max_wal_senders":
+    value: "7"
+  "wal_keep_segments":
+    value: "2000"
+  "hot_standby":
+    value: "on"
+  "hot_standby_feedback":
+    value: "on"
+  "effective_cache_size":
+    value: "1GB"
+  "default_statistics_target":
+    value: "100"
+  "log_destination":
+    value: "stderr"
+  "logging_collector":
+    value: "on"
+  "log_directory":
+    value: "pg_log"
+  "log_filename":
+    value: "postgresql-%a.log"
+  "log_truncate_on_rotation":
+    value: "on"
+  "log_rotation_age":
+    value: "30d"
+  "log_rotation_size":
+    value: "0"
+  "log_min_error_statement":
+    value: "error"
+  "log_line_prefix":
+    value: "< %m >"
+  "log_timezone":
+    value: "Europe/Helsinki"
+  "log_autovacuum_min_duration":
+    value: "0"
+  "autovacuum_max_workers":
+    value: "6"
+  "autovacuum_vacuum_scale_factor":
+    value: "0.01"
+  "autovacuum_analyze_scale_factor":
+    value: "0.005"
+  "autovacuum_vacuum_cost_delay":
+    value: "5ms"
+  "vacuum_freeze_table_age":
+    value: "190000000"
+  "datestyle":
+    value: "iso, mdy"
+  "timezone":
+    value: "Europe/Helsinki"
+  "lc_messages":
+    value: "en_US.UTF-8"
+  "lc_monetary":
+    value: "en_US.UTF-8"
+  "lc_numeric":
+    value: "en_US.UTF-8"
+  "lc_time":
+    value: "en_US.UTF-8"
+  "default_text_search_config":
+    value: "pg_catalog.english"
+
+pgbouncer::require_repo: false
+
+pgbouncer::config_params:
+  default_pool_size: 200
+  listen_port: 6432
+  max_client_conn: 1000
+  listen_addr: "%{::networking.ip}"
+  auth_type: md5
+  pool_mode: transaction
+  admin_users: postgres
+  stats_users: pgbouncer, postgres
+  auth_query: SELECT usename, passwd FROM pg_shadow WHERE usename=$1
+  ignore_startup_parameters: extra_float_digits
+
+pgbouncer::databases:
+  - source_db: "*"
+    host: "%{::networking.ip}"
+    auth_user: "pgbouncer"
+
+pgbouncer::userlist:
+  - user: "pgbouncer"
+    password: "123"

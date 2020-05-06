@@ -1,0 +1,95 @@
+---
+- name: Add centos repositories
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ centos_add_repo.node }}"
+
+- name: Add centos repositories
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ centos_add_repo.master }}"
+  when:
+    - not ansible_check_mode
+    - inventory_hostname in groups['puppet_master']
+
+- name: Yum update
+  yum:
+    name: "*"
+    state: latest
+
+- name: Install packages
+  yum:
+    name: "{{ centos.packages }}"
+    state: present
+  when: not ansible_check_mode
+
+- name: Install packages
+  yum:
+    name: "{{ centos.master_packages }}"
+    state: present
+  when:
+    - not ansible_check_mode
+    - inventory_hostname in groups['puppet_master']
+
+- name: Remove unneeded shit
+  yum:
+    name: "{{ centos.remove }}"
+    state: absent
+
+- name: Upgrade python2-pip
+  pip:
+    name: pip
+    extra_args: --upgrade
+  when: not ansible_check_mode
+
+- name: Enable and start ntp service
+  service:
+    name: ntpd
+    enabled: true
+    state: started
+
+- name: Put SELinux in permissive mode
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: Set hostname
+  hostname: name={{ inventory_hostname }}
+
+- name: Set timezone
+  timezone:
+    name: "{{ centos.timezone }}"
+
+- name: Configure locale
+  blockinfile:
+    dest: "/etc/environment"
+    block: "{{ centos.locale }}"
+
+- name: Load nf_conntrack
+  modprobe:
+    name: nf_conntrack
+    state: present
+
+- name: Generate modules-load.d
+  blockinfile:
+    dest: "/etc/modules-load.d/common_centos.conf"
+    block: "{{ centos.modules_load }}"
+    create: true
+    mode: 0644
+
+- name: Create /var/log/journal
+  file:
+    path: /var/log/journal
+    state: directory
+
+- name: Configure journald
+  ini_file:
+    dest: "/etc/systemd/journald.conf"
+    section: Journal
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    no_extra_spaces: true
+  loop: "{{ journald_options }}"
+  notify: restart journald

@@ -1,0 +1,21 @@
+{
+  "CHANGELOG.md": "a025f40a1d06a874b0c38b77e76370fc",
+  "Gemfile": "52c969e10ce568fb9fcfb317651c64d4",
+  "LICENSE": "d32239bcb673463ab874e80d47fae504",
+  "README.md": "c1f5af8e8ef924f6d8233beff3d10bdd",
+  "Rakefile": "6fcbdde429e08f42f65b2ab2c2b19cfb",
+  "files/pgbouncer": "0376c08bab4e2142c7afbb30d561e375",
+  "manifests/databases.pp": "75fe497c11ecd47ac582d3070599930c",
+  "manifests/init.pp": "ef29037d8d191cfe9e72b31b30785968",
+  "manifests/params.pp": "9763bf1435fc3c39e19f72815c7cdbda",
+  "manifests/userlist.pp": "6c1ace7b3eb7f885e9f47e66c6a4f169",
+  "metadata.json": "df0902aeb31f8e1bd9ad54d88ee9f052",
+  "spec/spec_helper.rb": "a55d1e6483344f8ec6963fcb2c220372",
+  "templates/pgbouncer.ini.databases.part1.erb": "f90c82e52f727681015fd10fd8400bc6",
+  "templates/pgbouncer.ini.databases.part2.erb": "b667fb5f845854944718f0bb14a504b7",
+  "templates/pgbouncer.ini.param.part.erb": "a2c971c6cd9d78ae9c721a4615abe689",
+  "templates/pgbouncer.ini.users.part1.erb": "48c8d1812c0d9ff6c0142709e78dbb0e",
+  "templates/pgbouncer.ini.users.part2.erb": "863a8588ff340b9c7a985aa5add1d8ec",
+  "templates/userlist.txt.erb": "f89e68f43494cb20edc2a948c4c9553f",
+  "tests/init.pp": "126a5b6049cfbc089d1998cd821c0b99"
+}

@@ -1,0 +1,13 @@
+---
+- name: configure puppet agent
+  ini_file:
+    path: /etc/puppetlabs/puppet/puppet.conf
+    section: main
+    option: "{{ item.name }}"
+    value: "{{ item.value }}"
+  loop: "{{ puppet_agent_conf }}"
+
+- name: restart rsyslog
+  systemd:
+    name: puppet
+    state: restarted
