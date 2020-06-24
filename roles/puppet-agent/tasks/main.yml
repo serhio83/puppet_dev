@@ -7,7 +7,7 @@
     value: "{{ item.value }}"
   loop: "{{ puppet_agent_conf }}"
 
-- name: restart rsyslog
+- name: restart puppet agent
   systemd:
     name: puppet
     state: restarted
