@@ -9,7 +9,7 @@ distro==1.4.0
 dnspython==1.16.0
 google-auth==1.7.1
 idna==2.8
-Jinja2==2.10.3
+Jinja2==2.11.3
 MarkupSafe==1.1.1
 mitogen==0.2.9
 netaddr==0.7.19
